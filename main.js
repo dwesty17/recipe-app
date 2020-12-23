@@ -1,4 +1,4 @@
-const { Sequelize } = require('sequelize');
+const { Sequelize, DataTypes } = require('sequelize');
 
 const sequelize = new Sequelize(
     process.env.DB_NAME || 'recipe_app',
@@ -13,7 +13,24 @@ const sequelize = new Sequelize(
 const main = async () => {
     try {
         await sequelize.authenticate();
-        console.log('Connection has been established successfully.');
+
+        const Recipe = sequelize.define('Recipe', {
+            name: {
+                type: DataTypes.STRING,
+            },
+            url: {
+                type: DataTypes.STRING,
+            },
+            have_made: {
+                type: DataTypes.BOOLEAN,
+            },
+        }, {
+            timestamps: false,
+            freezeTableName: true,
+        });
+
+        const allRecipes = await Recipe.findAll();
+        console.log(allRecipes);
     } catch (error) {
         console.error('Unable to connect to the database:', error);
     }
