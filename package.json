@@ -4,6 +4,10 @@
   "scripts": {
     "start": "node main.js"
   },
+  "dependencies": {
+    "mysql2": "2.2.5",
+    "sequelize": "6.3.5"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/dwesty17/recipe-app.git"
