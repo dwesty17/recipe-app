@@ -1,18 +1,16 @@
 const { Sequelize, DataTypes } = require('sequelize');
 
-const sequelize = new Sequelize(
-    process.env.DB_NAME || 'recipe_app',
-    process.env.DB_USER || 'root',
-    process.env.DB_PASSWORD || '',
-    {
-        host: process.env.DB_HOST || 'localhost',
-        dialect: 'mysql',
-    }
-);
-
 const main = async () => {
     try {
-        await sequelize.authenticate();
+        const sequelize = new Sequelize(
+            process.env.DB_NAME || 'recipe_app',
+            process.env.DB_USER || 'root',
+            process.env.DB_PASSWORD || '',
+            {
+                host: process.env.DB_HOST || 'localhost',
+                dialect: 'mysql',
+            }
+        );
 
         const Recipe = sequelize.define('Recipe', {
             name: {
@@ -29,10 +27,12 @@ const main = async () => {
             freezeTableName: true,
         });
 
-        const allRecipes = await Recipe.findAll();
-        console.log(allRecipes);
+        const recipes = await Recipe.findAll();
+        console.log(recipes);
+
+        await sequelize.close();
     } catch (error) {
-        console.error('Unable to connect to the database:', error);
+        console.error('An error occurred: ', error);
     }
 };
 
