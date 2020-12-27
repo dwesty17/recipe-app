@@ -1,7 +1,6 @@
-const { Sequelize, DataTypes } = require('sequelize');
-
 const express = require('express');
-
+const bodyParser = require('body-parser');
+const { Sequelize, DataTypes } = require('sequelize');
 
 const main = async () => {
     try {
@@ -34,26 +33,57 @@ const main = async () => {
         const app = express();
         const port = process.env.PORT|| 3000;
 
+        app.use(bodyParser.json());
+        app.use(bodyParser.urlencoded({ extended: true }));
+
         app.get('/recipes', async function (req, res) {
             const recipes = await Recipe.findAll();
             res.send(recipes);
-        })
+        });
 
-        app.post('/recipe', function (req, res) {
-            res.send('Got a POST request')
-        })
+        app.post('/recipe', async function (req, res) {
+            try {
+                const newRecipe = req.body;
+                const response = await Recipe.create(newRecipe);
+                res.send(response);
+            } catch (error) {
+                res.status(500).send("Unable to create recipe!");
+            }
+        });
 
-        app.put('/recipe', function (req, res) {
-            res.send('Got a PUT request at /user')
-        })
+        app.put('/recipe', async function (req, res) {
+            try {
+                const newRecipe = req.body;
+                const id = newRecipe.id;
+                delete newRecipe.id;
 
-        app.delete('/recipe', function (req, res) {
-            res.send('Got a DELETE request at /user')
-        })
+                await Recipe.update(newRecipe, {
+                    where: { id },
+                });
+
+                res.sendStatus(200);
+            } catch (error) {
+                res.status(500).send("Unable to update recipe!");
+            }
+        });
+
+        app.delete('/recipe', async function (req, res) {
+            try {
+                const id = req.body.id;
+
+                await Recipe.destroy({
+                    where: { id },
+                });
+
+                res.sendStatus(200);
+            } catch (error) {
+                res.status(500).send("Unable to delete recipe!");
+            }
+        });
 
         app.listen(port, () => {
             console.log(`Example app listening at http://localhost:${port}`)
-        })
+        });
 
         //await sequelize.close();
     } catch (error) {
